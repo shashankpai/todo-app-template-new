@@ -1,0 +1,89 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: java-maven-spring-25
+  title: Java Maven Spring Boot 4.1.0 Template
+  description: Generates a Spring Boot 4.1.0 application with Java 25, Maven, H2, Spring Security, Docker, CI, and a sample Todo CRUD module.
+  tags:
+    - java
+    - spring-boot
+    - maven
+    - recommended
+spec:
+  type: service
+  parameters:
+    - title: Provide some required information
+      required:
+        - componentName
+        - owner
+      properties:
+        componentName:
+          title: Component Name
+          type: string
+          description: Unique name of the component
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+        description:
+          title: Description
+          type: string
+          description: Description of the component
+          default: A Spring Boot application generated from Backstage
+    - title: Provide Maven coordinates
+      properties:
+        groupId:
+          title: Group ID
+          type: string
+          default: com.example
+        artifactId:
+          title: Artifact ID
+          type: string
+        packageName:
+          title: Package Name
+          type: string
+    - title: Provide repository information
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+  steps:
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          componentName: ${{ parameters.componentName }}
+          owner: ${{ parameters.owner }}
+          description: ${{ parameters.description }}
+          groupId: ${{ parameters.groupId }}
+          artifactId: ${{ parameters.artifactId | default(parameters.componentName) }}
+          packageName: ${{ parameters.packageName | default(parameters.groupId) }}
+          packagePath: ${{ (parameters.packageName | default(parameters.groupId)) | replace(".", "/") }}
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts:
+          - github.com
+        description: ${{ parameters.description }}
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}

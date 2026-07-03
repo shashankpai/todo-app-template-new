@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.componentName }}
+  description: ${{ values.description }}
+  tags:
+    - java
+    - spring-boot
+    - maven
+spec:
+  type: service
+  owner: ${{ values.owner }}
+  lifecycle: experimental

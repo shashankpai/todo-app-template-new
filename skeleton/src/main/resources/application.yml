@@ -1,0 +1,49 @@
+spring:
+  # H2 in-memory database for dev/test
+  # PostgreSQL configuration is commented out below for production guidance
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Fixed security credentials for local development
+  security:
+    user:
+      name: admin
+      password: admin123
+
+  # --- PostgreSQL configuration for production ---
+  # Uncomment and configure for production deployment:
+  # datasource:
+  #   url: jdbc:postgresql://localhost:5432/dbname
+  #   driver-class-name: org.postgresql.Driver
+  #   username: ${DB_USERNAME}
+  #   password: ${DB_PASSWORD}
+  # jpa:
+  #   database-platform: org.hibernate.dialect.PostgreSQLDialect
+  #   hibernate:
+  #     ddl-auto: validate
+
+# ECS structured logging via Spring Boot native config
+# No external logging dependencies needed — no logback-spring.xml required
+logging:
+  structured:
+    format:
+      console: ecs
+
+# Optional OTLP log export for observability integration
+# Uncomment to enable exporting logs via OTLP:
+# management:
+#   logging:
+#     export:
+#       otlp:
+#         enabled: true
