@@ -60,12 +60,17 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
+            allowedOwners:
+              - shashankpai
   steps:
     - id: fetch-base
       name: Fetch Base
       action: fetch:template
       input:
         url: ./skeleton
+        copyWithoutTemplating:
+          - .github/workflows/*.yml
+          - .github/workflows/*.yaml
         values:
           componentName: ${{ parameters.componentName }}
           owner: ${{ parameters.owner }}
